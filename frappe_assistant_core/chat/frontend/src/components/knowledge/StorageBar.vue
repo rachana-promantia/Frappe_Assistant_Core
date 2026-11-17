@@ -10,7 +10,8 @@
 				></div>
 			</div>
 			<span class="storage-inline-label"
-				>{{ formatStorageSize(storage.used_mb) }} /
+				>{{ formatStorageSize(storage.used_mb) }}
+				{{ unlimited ? "·" : "/" }}
 				{{ formatStorageSize(storage.quota_mb) }}</span
 			>
 		</template>
@@ -28,7 +29,7 @@
 				<div class="storage-info">
 					<span class="storage-used">{{ formatStorageSize(storage.used_mb) }} used</span>
 					<span class="storage-total"
-						>{{ formatStorageSize(storage.quota_mb) }} total</span
+						>{{ formatStorageSize(storage.quota_mb) }}{{ unlimited ? "" : " total" }}</span
 					>
 				</div>
 			</div>
@@ -38,14 +39,16 @@
 
 <script setup>
 import { computed } from "vue";
-import { formatStorageSize } from "@/composables/useFormatters";
+import { formatStorageSize, isUnlimitedQuota } from "@/composables/useFormatters";
 
 const props = defineProps({
 	storage: { type: Object, default: null },
 	compact: { type: Boolean, default: false },
 });
 
-const pct = computed(() => Math.min(props.storage?.usage_percentage || 0, 100));
+// FAC Cloud sends quota_mb -1 for a plan with no storage limit: the bar then never fills
+const unlimited = computed(() => isUnlimitedQuota(props.storage?.quota_mb));
+const pct = computed(() => (unlimited.value ? 0 : Math.min(props.storage?.usage_percentage || 0, 100)));
 
 const storageBarClass = computed(() => {
 	const p = pct.value;

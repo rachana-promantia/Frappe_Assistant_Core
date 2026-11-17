@@ -117,11 +117,19 @@ export function formatFileSizeMb(sizeMb) {
 }
 
 /**
+ * True for a storage quota that means "no limit": FAC Cloud sends -1 for a plan without one.
+ */
+export function isUnlimitedQuota(mb) {
+	return typeof mb === "number" && mb < 0;
+}
+
+/**
  * Format megabytes with auto-scale to GB (e.g. 500 → "500.0 MB", 1500 → "1.5 GB").
  * Used by KnowledgeBase storage bar.
  */
 export function formatStorageSize(mb) {
 	if (!mb && mb !== 0) return "0 MB";
+	if (isUnlimitedQuota(mb)) return window.__ ? window.__("Unlimited") : "Unlimited";
 	if (mb >= 1024) return (mb / 1024).toFixed(1) + " GB";
 	if (mb < 1) return mb.toFixed(2) + " MB";
 	return mb.toFixed(1) + " MB";

@@ -230,6 +230,7 @@ import KnowledgeSkeleton from "@/components/knowledge/KnowledgeSkeleton.vue";
 import KnowledgeStates from "@/components/knowledge/KnowledgeStates.vue";
 import KnowledgeToolbar from "@/components/knowledge/KnowledgeToolbar.vue";
 import KnowledgeDocumentGrid from "@/components/knowledge/KnowledgeDocumentGrid.vue";
+import { storageSummary } from "@/components/knowledge/storageSummary";
 import ListPageShell from "@/components/common/list/ListPageShell.vue";
 import ListHeaderBand from "@/components/common/list/ListHeaderBand.vue";
 import EmptyState from "@/components/common/list/EmptyState.vue";
@@ -276,14 +277,7 @@ const filteredDocuments = computed(() => {
 	return docs;
 });
 
-const storageStat = computed(() => {
-	const n = documents.value.length;
-	const docWord = n === 1 ? "document" : "documents";
-	// storage_info returns { used_mb, quota_mb, usage_percentage } — quota_mb is the limit
-	const used = storage.value ? (storage.value.used_mb ?? 0).toFixed(1) : "0.0";
-	const limit = storage.value ? (storage.value.quota_mb ?? 10) : 10;
-	return `${n} ${docWord} · ${used} of ${limit} MB used`;
-});
+const storageStat = computed(() => storageSummary(documents.value.length, storage.value));
 
 const {
 	uploads,
